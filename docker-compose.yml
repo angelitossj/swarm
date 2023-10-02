@@ -1,0 +1,39 @@
+version: "3.7"
+
+services:
+  servicio-apache:
+    image: php:apache-bullseye
+    ports:
+      - "8080:80"
+    volumes:
+      - C:\Users\angel\OneDrive\Escritorio\swarm:/var/www/html/index.php  # Monta el archivo PHP
+    depends_on:
+      - mysql  
+    deploy:
+      replicas: 3
+
+  servicio-nodejs:
+    image: node:14
+    ports:
+      - "8090:3000"
+    volumes:
+      - C:\Users\angel\OneDrive\Escritorio\swarm:/app
+    depends_on:
+      - mysql
+    deploy:
+      replicas: 3
+    command: >
+      bash -c "echo 'const http = require(\"http\");
+      http.createServer((req, res) => res.send(\"Hola mundo\")).listen(3000);'
+      > index.js && node index.js"
+
+  mysql:
+    image: mysql:debian
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - C:\Users\angel\OneDrive\Escritorio\swarm\mysql:/docker-entrypoint-initdb.d/datos.sql  # Monta el archivo SQL al directorio de inicialización de MySQL
+
+networks:
+  default:
+    driver: overlay

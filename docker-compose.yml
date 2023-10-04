@@ -6,11 +6,19 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - C:\Users\angel\OneDrive\Escritorio\swarm:/var/www/html/index.php  # Monta el archivo PHP
+      - C:\Users\angel\OneDrive\Escritorio\swarm:/var/www/html/  # Monta el archivo PHP
+    command: >
+      sh -c "
+        docker-php-ext-install mysqli && 
+        docker-php-ext-enable mysqli && 
+        apache2-foreground
+      "
     depends_on:
       - mysql  
     deploy:
       replicas: 3
+    networks:
+      - networkName
 
   servicio-nodejs:
     image: node:14
@@ -19,21 +27,25 @@ services:
     volumes:
       - C:\Users\angel\OneDrive\Escritorio\swarm:/app
     depends_on:
-      - mysql
+      - mysqlito
     deploy:
       replicas: 3
     command: >
       bash -c "echo 'const http = require(\"http\");
       http.createServer((req, res) => res.send(\"Hola mundo\")).listen(3000);'
       > index.js && node index.js"
+    networks:
+      - networkName
 
-  mysql:
+  mysqlito:
     image: mysql:debian
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: 1234
     volumes:
-      - C:\Users\angel\OneDrive\Escritorio\swarm\mysql:/docker-entrypoint-initdb.d/datos.sql  # Monta el archivo SQL al directorio de inicialización de MySQL
+      - C:\Users\angel\OneDrive\Escritorio\swarm\mysql/datos.sql:/docker-entrypoint-initdb.d/datos.sql  # Monta el archivo SQL al directorio de inicialización de MySQL
+      - C:\Users\angel\OneDrive\Escritorio\swarm\mysql-datos:/var/lib/mysql
+    networks:
+      - networkName
 
 networks:
-  default:
-    driver: overlay
+  networkName:

@@ -27,9 +27,9 @@
     </tr>
 
     <?php
-    $servername = "localhost";
+    $servername = "mysqlito";
     $username = "root";
-    $password = "root1";
+    $password = "1234";
     $dbname = "prueba";
 
     // Crear conexión
